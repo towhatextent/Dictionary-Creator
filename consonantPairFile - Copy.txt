@@ -1,0 +1,3 @@
+	p	b	t	d	k	g	?	m	n	J	p\	B	s	z	S	Z	G	h	r\	j	l	|\
+onsets	p\ B S h r\ j l s 	Z r\ j l 	p\ B z S Z G r\ j l s 	B Z G h r\ j l z 	p\ B z S Z G r\ j l s h 	z Z r\ j l 		S Z h r\ j l B 	r\ j l 		m n J z h r\ j l 	h r\ j l z Z 	d m n J p\ B r\ j l p t k 	d g m n J p\ B G h r\ j l 	m n J p\ B r\ j l p t d g 	b m n J p\ B r\ j l d 	z Z r\ B 	b m n J p\ B s z S Z r\ j l p t 	l 		r\ j 	
+coda	s 	s S 	s 	s z 	s h 	s h 		p b t d k g ? p\ s z B 	p b t d k g ? p\ B s z S Z h 		p t k s 	p t k s S z Z 	p t k 		p t d g 	p t k g d 	s B 	k p t 	p b t d k g m n J p\ B s z S Z G h l 	p b t d k g m n J p\ B s z S Z G h r\ l 	p b t d k g m n J p\ B s z S Z G h 	
