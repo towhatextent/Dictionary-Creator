@@ -93,6 +93,9 @@ nucleusFile = nucleusFile.split('\n')
 #Get number of syllables to generate
 numberOfSyllables = 0
 
+#Open output syllable file
+outputSyllableFile = open("syllableList.txt","w")
+
 #Request input until the value is acceptable
 while numberOfSyllables == 0:
     try:
@@ -105,9 +108,12 @@ for i in range(numberOfSyllables):
     syllable = createHalfShell("onset")+nucleusFile[random.randint(0,len(nucleusFile)-1)]+createHalfShell("coda")
 
     #Print the syllable
-    print(i+1,":",syllable)
+    outputSyllableFile.write(syllable+'\n')
+    
+#Close output syllable file
+outputSyllableFile.close()
 
-
+#Goodbye!
     
     
 
