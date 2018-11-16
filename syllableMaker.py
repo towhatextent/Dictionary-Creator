@@ -97,7 +97,7 @@ numberOfSyllables = 0
 outputSyllableFile = open("syllableList.txt","w")
 
 #Request input until the value is acceptable
-while numberOfSyllables == 0:
+while numberOfSyllables <= 0:
     try:
         numberOfSyllables = int(input("How many syllables?\n"))
     except:
