@@ -1,24 +1,22 @@
 #Syllable Maker
 #Designed for the making of conlangs
 
-#Bug on line 70
-
 import random
 
-#Define a program to "unpack" the actual file, i.e: render it usable
-def unpackConsonantFile(consonantFile2):
+#Define a program to "unpack" the actual list, i.e: render it usable
+def unpackConsonantList(inputConsonantList):
     #Parse the consonant file by line breaks
-    consonantFile2 = consonantFile2.split("\n")
+    inputConsonantList = inputConsonantList.split("\n")
 
     #Parse each of them by tabs
     #Reassign all the variables to their parsed versions
-    for i in range(len(consonantFile2)):
-        consonantFile2[i] = consonantFile2[i].split("\t")
+    for i in range(len(inputConsonantList)):
+        inputConsonantList[i] = inputConsonantList[i].split("\t")
 
         #Parse each sublist by spaces
-        for j in range(len(consonantFile2[i])):
-            consonantFile2[i][j] = consonantFile2[i][j].split(" ")
-    return(consonantFile2)
+        for j in range(len(inputConsonantList[i])):
+            inputConsonantList[i][j] = inputConsonantList[i][j].split(" ")
+    return(inputConsonantList)
 
 #Convert the list of all consonants to a regular list of strings
 def convertListOfListsToListOfStrings(listOfLists):
@@ -28,6 +26,7 @@ def convertListOfListsToListOfStrings(listOfLists):
         #I put a [0] at the end because this is made for lists of lists in which the second tier of lists contains a single element
         outputList.append(listOfLists[i][0])
     return outputList
+
 
 #Define a program to create half the shell of a syllable
 def createHalfShell(position):
@@ -51,22 +50,26 @@ def createHalfShell(position):
         
         #Check if this is the first consonant or if other rules need to be applied
         if i == 0:
-            #Store the index of the consonant used in this cycle
-            whichOne = random.randint(0,len(listOfConsonants)-1)
-            #Create the new consonant
-            newConsonant = listOfConsonants[whichOne]
+            newConsonant = ''
+            #Prevents empty strings
+            while newConsonant not in listOfConsonants:
+                #Store the index of the consonant used in this cycle
+                whichOne = random.randint(0,len(listOfConsonants)-1)
+                #Create the new consonant
+                newConsonant = listOfConsonants[whichOne]
         else:
             #Obtain the proper follower set from the list of lists of consonants using the index of the last value
             whichFollowerSet = listOfListsOfUsableConsonants[whichOne]
 
-            #Get a consonant index from the list of followers
-            whichOne = random.randint(0,len(whichFollowerSet)-1)
-            #Get a consonant from the follower set
-            newConsonant = whichFollowerSet[whichOne]
+            #Prevents empty strings
+            while newConsonant not in listOfConsonants:
+                #Get a consonant index from the list of followers
+                whichOne = random.randint(0,len(whichFollowerSet)-1)
+                #Get a consonant from the follower set
+                newConsonant = whichFollowerSet[whichOne]
+
 
             #Find the new consonant in the list of consonants to set whichOne to a re-usable value
-            #WARNING: THERE IS AN ERROR IN THE FOLLOWING LINE.
-            #ValueError: '' is not in list
             whichOne = listOfConsonants.index(newConsonant)
             
         consonantCluster += str(newConsonant)
@@ -74,25 +77,25 @@ def createHalfShell(position):
     return consonantCluster
 
 #Open both files
-consonantFileRaw = open("consonantPairFile.txt","r")
-nucleusFileRaw = open("vowelsXSAMPA.txt","r")
+consonantFile = open("consonantPairFile.txt","r")
+nucleusFile = open("vowelsXSAMPA.txt","r")
 
-consonantFile = consonantFileRaw.read()
-nucleusFile = nucleusFileRaw.read()
+consonantList = consonantFile.read()
+nucleusList = nucleusFile.read()
 
-consonantFileRaw.close()
-nucleusFileRaw.close()
+consonantFile.close()
+nucleusFile.close()
 
-#Make the consonant file something usable
-consonantFile = unpackConsonantFile(consonantFile)
+#Make the consonant list something usable
+consonantList = unpackConsonantList(consonantList)
 
 #Assign names to the lists
-listOfConsonants = convertListOfListsToListOfStrings(consonantFile[0])
-listOfOnsetFollowers = consonantFile[1]
-listOfCodaFollowers = consonantFile[2]
+listOfConsonants = convertListOfListsToListOfStrings(consonantList[0])
+listOfOnsetFollowers = consonantList[1]
+listOfCodaFollowers = consonantList[2]
 
-#Make the nucleus file something usable
-nucleusFile = nucleusFile.split('\n')
+#Make the nucleus list something usable
+nucleusList = nucleusList.split('\n')
 
 #Get number of syllables to generate
 numberOfSyllables = 0
@@ -109,7 +112,11 @@ while numberOfSyllables <= 0:
 
 #Create as many syllables as requested
 for i in range(numberOfSyllables):
-    syllable = createHalfShell("onset")+nucleusFile[random.randint(0,len(nucleusFile)-1)]+createHalfShell("coda")
+    onset = createHalfShell("onset")
+    nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
+    coda = createHalfShell("coda")
+    
+    syllable = onset + nucleus + coda
 
     #Print the syllable
     outputSyllableFile.write(syllable+'\n')
