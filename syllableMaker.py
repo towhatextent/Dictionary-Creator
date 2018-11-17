@@ -1,6 +1,8 @@
 #Syllable Maker
 #Designed for the making of conlangs
 
+#Bug on line 70
+
 import random
 
 #Define a program to "unpack" the actual file, i.e: render it usable
@@ -63,6 +65,8 @@ def createHalfShell(position):
             newConsonant = whichFollowerSet[whichOne]
 
             #Find the new consonant in the list of consonants to set whichOne to a re-usable value
+            #WARNING: THERE IS AN ERROR IN THE FOLLOWING LINE.
+            #ValueError: '' is not in list
             whichOne = listOfConsonants.index(newConsonant)
             
         consonantCluster += str(newConsonant)
