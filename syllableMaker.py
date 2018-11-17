@@ -3,6 +3,15 @@
 
 import random
 
+#Define a function to request input
+def requestIntegerInput(variable,prompt,minValue):
+    while variable < minValue:
+        try:
+            variable = int(input(prompt+'\n'))
+        except:
+            print("Please type in a positive integer value.")
+    return variable
+
 #Define a program to "unpack" the actual list, i.e: render it usable
 def unpackConsonantList(inputConsonantList):
     #Parse the consonant file by line breaks
@@ -32,13 +41,13 @@ def convertListOfListsToListOfStrings(listOfLists):
 def createHalfShell(position):
     #Position means onset or coda
     #Check which position
-    if position == "onset":
+    if position == 'o':
         listOfListsOfUsableConsonants = listOfOnsetFollowers
-    elif position == "coda":
+    elif position == 'c':
         listOfListsOfUsableConsonants = listOfCodaFollowers
 
     #Number of consonants
-    numConsonant = random.randint(0,5)
+    numConsonant = random.randint(minClusterLength,maxClusterLength)
 
     #Cluster
     consonantCluster = ""
@@ -61,6 +70,8 @@ def createHalfShell(position):
             #Obtain the proper follower set from the list of lists of consonants using the index of the last value
             whichFollowerSet = listOfListsOfUsableConsonants[whichOne]
 
+            newConsonant = ''
+            
             #Prevents empty strings
             while newConsonant not in listOfConsonants:
                 #Get a consonant index from the list of followers
@@ -75,6 +86,19 @@ def createHalfShell(position):
         consonantCluster += str(newConsonant)
 
     return consonantCluster
+
+#Define subprogram to turn list into string
+def convertListToString(inputList):
+    outputString = ''
+    #Append every element to an empty string
+    for i in range(len(inputList)):
+        outputString = outputString + inputList[i]
+        #Check if it's the last one
+        if i != len(inputList)-1:
+             outputString = outputString + '\n'
+            
+    return outputString
+
 
 #Open both files
 consonantFile = open("consonantPairFile.txt","r")
@@ -98,30 +122,46 @@ listOfCodaFollowers = consonantList[2]
 nucleusList = nucleusList.split('\n')
 
 #Get number of syllables to generate
-numberOfSyllables = 0
+numberOfSyllables = -1
+minClusterLength = -1
+maxClusterLength = -1
 
-#Open output syllable file
-outputSyllableFile = open("syllableList.txt","w")
+numberOfSyllables = requestIntegerInput(numberOfSyllables,'How many syllables?',1)
+minClusterLength = requestIntegerInput(minClusterLength,'How short should the clusters be, minimum?',0)
+maxClusterLength = requestIntegerInput(maxClusterLength,'How long should the clusters be, maximum?',0)
 
-#Request input until the value is acceptable
-while numberOfSyllables <= 0:
-    try:
-        numberOfSyllables = int(input("How many syllables?\n"))
-    except:
-        print("Please type in an integer value.")
+syllableList = []
 
 #Create as many syllables as requested
 for i in range(numberOfSyllables):
-    onset = createHalfShell("onset")
-    nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
-    coda = createHalfShell("coda")
-    
-    syllable = onset + nucleus + coda
+    #Hopefully this way the program thinks it's in the file.
+    numberOfInstancesOfSyllable = 1
 
-    #Print the syllable
-    outputSyllableFile.write(syllable+'\n')
-    
-#Close output syllable file
+    counter = 0
+
+    syllable = ''
+
+    #Create a new syllable until it is unique
+    while numberOfInstancesOfSyllable >= 1 and counter <= 10:
+        onset = createHalfShell('o')
+        nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
+        coda = createHalfShell('c')
+        
+        syllable = onset + nucleus + coda
+
+        numberOfInstancesOfSyllable = syllableList.count(syllable)
+
+        counter += 1
+
+    #If syllable is not empty, add the syllable to the list
+    if syllable != '':
+        syllableList.append(syllable)
+
+syllableList = convertListToString(syllableList)
+
+#Output to file
+outputSyllableFile = open("syllableList.txt","w+")
+outputSyllableFile.write(syllableList)
 outputSyllableFile.close()
 
 #Goodbye!
