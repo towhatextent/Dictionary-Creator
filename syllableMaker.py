@@ -146,6 +146,10 @@ def main():
 
             counter += 1
 
+            #If the counter is equal to 10, set syllable to an empty string
+            if counter >= 10:
+                syllable = ''
+
         #If syllable is not empty, add the syllable to the list
         if syllable != '':
             syllableList.append(syllable)
