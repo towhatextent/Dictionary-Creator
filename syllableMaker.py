@@ -38,14 +38,12 @@ def convertListOfListsToListOfStrings(listOfLists):
 
 
 #Define a program to create half the shell of a syllable
-def createHalfShell(position):
-    #Position means onset or coda
-    #Check which position
-    if position == 'o':
-        listOfListsOfUsableConsonants = listOfOnsetFollowers
-    elif position == 'c':
-        listOfListsOfUsableConsonants = listOfCodaFollowers
+def createHalfShell(listOfListsOfUsableConsonants, listOfConsonants):
 
+    #Declare global variables
+    global minClusterLength
+    global maxClusterLength
+    
     #Number of consonants
     numConsonant = random.randint(minClusterLength,maxClusterLength)
 
@@ -99,72 +97,77 @@ def convertListToString(inputList):
             
     return outputString
 
+#Define main program
+def main():
+    #Open both files
+    consonantFile = open("consonantPairFile.txt","r")
+    nucleusFile = open("vowelsXSAMPA.txt","r")
 
-#Open both files
-consonantFile = open("consonantPairFile.txt","r")
-nucleusFile = open("vowelsXSAMPA.txt","r")
+    consonantList = consonantFile.read()
+    nucleusList = nucleusFile.read()
 
-consonantList = consonantFile.read()
-nucleusList = nucleusFile.read()
+    consonantFile.close()
+    nucleusFile.close()
 
-consonantFile.close()
-nucleusFile.close()
+    del consonantFile
+    del nucleusFile
 
-#Make the consonant list something usable
-consonantList = unpackConsonantList(consonantList)
+    #Make the consonant list something usable
+    consonantList = unpackConsonantList(consonantList)
 
-#Assign names to the lists
-listOfConsonants = convertListOfListsToListOfStrings(consonantList[0])
-listOfOnsetFollowers = consonantList[1]
-listOfCodaFollowers = consonantList[2]
+    #Assign names to the lists
+    listOfConsonants = convertListOfListsToListOfStrings(consonantList[0])
+    listOfOnsetFollowers = consonantList[1]
+    listOfCodaFollowers = consonantList[2]
 
-#Make the nucleus list something usable
-nucleusList = nucleusList.split('\n')
+    #Make the nucleus list something usable
+    nucleusList = nucleusList.split('\n')
 
-#Get number of syllables to generate
-numberOfSyllables = -1
-minClusterLength = -1
-maxClusterLength = -1
+    syllableList = []
 
-numberOfSyllables = requestIntegerInput(numberOfSyllables,'How many syllables?',1)
-minClusterLength = requestIntegerInput(minClusterLength,'How short should the clusters be, minimum?',0)
-maxClusterLength = requestIntegerInput(maxClusterLength,'How long should the clusters be, maximum?',0)
+    #Create as many syllables as requested
+    for i in range(numberOfSyllables):
+        #Hopefully this way the program thinks it's in the file.
+        numberOfInstancesOfSyllable = 1
 
-syllableList = []
+        counter = 0
 
-#Create as many syllables as requested
-for i in range(numberOfSyllables):
-    #Hopefully this way the program thinks it's in the file.
-    numberOfInstancesOfSyllable = 1
+        syllable = ''
 
-    counter = 0
+        #Create a new syllable until it is unique
+        while numberOfInstancesOfSyllable >= 1 and counter <= 10:
+            onset = createHalfShell(listOfOnsetFollowers,listOfConsonants)
+            nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
+            coda = createHalfShell(listOfCodaFollowers,listOfConsonants)
+            
+            syllable = onset + nucleus + coda
 
-    syllable = ''
+            numberOfInstancesOfSyllable = syllableList.count(syllable)
 
-    #Create a new syllable until it is unique
-    while numberOfInstancesOfSyllable >= 1 and counter <= 10:
-        onset = createHalfShell('o')
-        nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
-        coda = createHalfShell('c')
-        
-        syllable = onset + nucleus + coda
+            counter += 1
 
-        numberOfInstancesOfSyllable = syllableList.count(syllable)
+        #If syllable is not empty, add the syllable to the list
+        if syllable != '':
+            syllableList.append(syllable)
 
-        counter += 1
+    syllableList = convertListToString(syllableList)
 
-    #If syllable is not empty, add the syllable to the list
-    if syllable != '':
-        syllableList.append(syllable)
+    #Output to file
+    outputSyllableFile = open("syllableList.txt","w+")
+    outputSyllableFile.write(syllableList)
+    outputSyllableFile.close()
 
-syllableList = convertListToString(syllableList)
-
-#Output to file
-outputSyllableFile = open("syllableList.txt","w+")
-outputSyllableFile.write(syllableList)
-outputSyllableFile.close()
-
-#Goodbye!
+#Run main program
+if __name__ == '__main__':
+    #Declare some global variables
+    numberOfSyllables = -1
     
-    
+    minClusterLength = -1
+    maxClusterLength = -1
 
+    numberOfSyllables = requestIntegerInput(numberOfSyllables,'How many syllables?',1)
+    
+    minClusterLength = requestIntegerInput(minClusterLength,'How short should the clusters be, minimum?',0)
+    maxClusterLength = requestIntegerInput(maxClusterLength,'How long should the clusters be, maximum?',minClusterLength)
+    
+    main()
