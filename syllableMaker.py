@@ -3,6 +3,15 @@
 
 import random
 
+#Define a function to request input
+def requestIntegerInput(variable,prompt,minValue):
+    while variable < minValue:
+        try:
+            variable = int(input(prompt+'\n'))
+        except:
+            print("Please type in a positive integer value.")
+    return variable
+
 #Define a program to "unpack" the actual list, i.e: render it usable
 def unpackConsonantList(inputConsonantList):
     #Parse the consonant file by line breaks
@@ -29,16 +38,14 @@ def convertListOfListsToListOfStrings(listOfLists):
 
 
 #Define a program to create half the shell of a syllable
-def createHalfShell(position):
-    #Position means onset or coda
-    #Check which position
-    if position == "onset":
-        listOfListsOfUsableConsonants = listOfOnsetFollowers
-    elif position == "coda":
-        listOfListsOfUsableConsonants = listOfCodaFollowers
+def createHalfShell(listOfListsOfUsableConsonants, listOfConsonants):
 
+    #Declare global variables
+    global minClusterLength
+    global maxClusterLength
+    
     #Number of consonants
-    numConsonant = random.randint(0,5)
+    numConsonant = random.randint(minClusterLength,maxClusterLength)
 
     #Cluster
     consonantCluster = ""
@@ -61,6 +68,8 @@ def createHalfShell(position):
             #Obtain the proper follower set from the list of lists of consonants using the index of the last value
             whichFollowerSet = listOfListsOfUsableConsonants[whichOne]
 
+            newConsonant = ''
+            
             #Prevents empty strings
             while newConsonant not in listOfConsonants:
                 #Get a consonant index from the list of followers
@@ -76,55 +85,89 @@ def createHalfShell(position):
 
     return consonantCluster
 
-#Open both files
-consonantFile = open("consonantPairFile.txt","r")
-nucleusFile = open("vowelsXSAMPA.txt","r")
+#Define subprogram to turn list into string
+def convertListToString(inputList):
+    outputString = ''
+    #Append every element to an empty string
+    for i in range(len(inputList)):
+        outputString = outputString + inputList[i]
+        #Check if it's the last one
+        if i != len(inputList)-1:
+             outputString = outputString + '\n'
+            
+    return outputString
 
-consonantList = consonantFile.read()
-nucleusList = nucleusFile.read()
+#Define main program
+def main():
+    #Open both files
+    consonantFile = open("consonantPairFile.txt","r")
+    nucleusFile = open("vowelsXSAMPA.txt","r")
 
-consonantFile.close()
-nucleusFile.close()
+    consonantList = consonantFile.read()
+    nucleusList = nucleusFile.read()
 
-#Make the consonant list something usable
-consonantList = unpackConsonantList(consonantList)
+    consonantFile.close()
+    nucleusFile.close()
 
-#Assign names to the lists
-listOfConsonants = convertListOfListsToListOfStrings(consonantList[0])
-listOfOnsetFollowers = consonantList[1]
-listOfCodaFollowers = consonantList[2]
+    del consonantFile
+    del nucleusFile
 
-#Make the nucleus list something usable
-nucleusList = nucleusList.split('\n')
+    #Make the consonant list something usable
+    consonantList = unpackConsonantList(consonantList)
 
-#Get number of syllables to generate
-numberOfSyllables = 0
+    #Assign names to the lists
+    listOfConsonants = convertListOfListsToListOfStrings(consonantList[0])
+    listOfOnsetFollowers = consonantList[1]
+    listOfCodaFollowers = consonantList[2]
 
-#Open output syllable file
-outputSyllableFile = open("syllableList.txt","w")
+    #Make the nucleus list something usable
+    nucleusList = nucleusList.split('\n')
 
-#Request input until the value is acceptable
-while numberOfSyllables <= 0:
-    try:
-        numberOfSyllables = int(input("How many syllables?\n"))
-    except:
-        print("Please type in an integer value.")
+    syllableList = []
 
-#Create as many syllables as requested
-for i in range(numberOfSyllables):
-    onset = createHalfShell("onset")
-    nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
-    coda = createHalfShell("coda")
+    #Create as many syllables as requested
+    for i in range(numberOfSyllables):
+        #Hopefully this way the program thinks it's in the file.
+        numberOfInstancesOfSyllable = 1
+
+        counter = 0
+
+        syllable = ''
+
+        #Create a new syllable until it is unique
+        while numberOfInstancesOfSyllable >= 1 and counter <= 10:
+            onset = createHalfShell(listOfOnsetFollowers,listOfConsonants)
+            nucleus = nucleusList[random.randint(0,len(nucleusList)-1)]
+            coda = createHalfShell(listOfCodaFollowers,listOfConsonants)
+            
+            syllable = onset + nucleus + coda
+
+            numberOfInstancesOfSyllable = syllableList.count(syllable)
+
+            counter += 1
+
+        #If syllable is not empty, add the syllable to the list
+        if syllable != '':
+            syllableList.append(syllable)
+
+    syllableList = convertListToString(syllableList)
+
+    #Output to file
+    outputSyllableFile = open("syllableList.txt","w+")
+    outputSyllableFile.write(syllableList)
+    outputSyllableFile.close()
+
+#Run main program
+if __name__ == '__main__':
+    #Declare some global variables
+    numberOfSyllables = -1
     
-    syllable = onset + nucleus + coda
+    minClusterLength = -1
+    maxClusterLength = -1
 
-    #Print the syllable
-    outputSyllableFile.write(syllable+'\n')
+    numberOfSyllables = requestIntegerInput(numberOfSyllables,'How many syllables?',1)
     
-#Close output syllable file
-outputSyllableFile.close()
-
-#Goodbye!
+    minClusterLength = requestIntegerInput(minClusterLength,'How short should the clusters be, minimum?',0)
+    maxClusterLength = requestIntegerInput(maxClusterLength,'How long should the clusters be, maximum?',minClusterLength)
     
-    
-
+    main()
